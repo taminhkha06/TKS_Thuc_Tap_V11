@@ -79,6 +79,7 @@
 
     protected override void Update_Data()
     {
+        // Validate dữ liệu trước khi cập nhật.
         m_objData.So_Phieu_Nhap_Kho = m_objData.So_Phieu_Nhap_Kho?.Trim();
         if (string.IsNullOrWhiteSpace(m_objData.So_Phieu_Nhap_Kho))
             throw new InvalidOperationException("Số phiếu nhập không được để trống.");
@@ -88,12 +89,13 @@
             throw new InvalidOperationException("Nhà cung cấp không được để trống.");
         if (!m_objData.Ngay_Nhap_Kho.HasValue)
             throw new InvalidOperationException("Ngày nhập kho không được để trống.");
-
+        // Cập nhật thông tin người cập nhật và chức năng cập nhật.
         m_objData.Last_Updated_By = r_strActive_User_Name;
         m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
         new CDM_Nhap_Kho_Controller().FQ_111_NK_sp_upd_Update_Header(m_objData);
-
+        // Clone dữ liệu sau khi cập nhật để trả về cho trang cha.
         CDM_Nhap_Kho v_objCloneAfter = new();
+        //Dòng này gọi phương thức Clone_Entity() của lớp tiện ích CUtility.
         CUtility.Clone_Entity(m_objData, v_objCloneAfter);
         r_objDes = v_objCloneAfter;
     }

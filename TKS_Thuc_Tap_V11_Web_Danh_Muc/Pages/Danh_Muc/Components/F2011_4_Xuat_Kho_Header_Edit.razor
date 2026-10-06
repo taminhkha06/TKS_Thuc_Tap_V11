@@ -1,0 +1,86 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh thông tin phiếu xuất")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(() => Modal_Cancel())"></button>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <EditForm Model="@m_objData">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <label class="form-label">@Get_Language_Data_Field("Số phiếu xuất"):</label>
+                            <input @ref="txtFocus" @bind="m_objData.So_Phieu_Xuat_Kho" class="form-control" maxlength="50" required />
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <label class="form-label">@Get_Language_Data_Field("Ngày xuất kho"):</label>
+                            <TelerikDatePicker @bind-Value="m_objData.Ngay_Xuat_Kho" Format="@CConfig.Date_Format_String" Width="100%"></TelerikDatePicker>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <label class="form-label">@Get_Language_Data_Field("Kho"):</label>
+                            <select @bind="m_objData.Kho_ID" class="form-select">
+                                <option value="0">-- @Get_Language_Data_Field("Chọn kho") --</option>
+                                @foreach (CDM_Kho v_objKho in m_arrKho)
+                                {
+                                    <option value="@v_objKho.Auto_ID">@v_objKho.Ten_Kho</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-lg-12 mb-3">
+                            <label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+                            <textarea @bind="m_objData.Ghi_Chu" class="form-control" rows="3" maxlength="1000"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu thay đổi")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CDM_Xuat_Kho m_objData = new();
+    private List<CDM_Kho> m_arrKho = new();
+
+    protected override void Load_Data()
+    {
+        CDM_Xuat_Kho_Controller v_objCtrData = new();
+        m_objData = v_objCtrData.FQ_111_XK_sp_sel_Get_By_ID(r_iAuto_ID) ?? new CDM_Xuat_Kho();
+        if (m_objData.Auto_ID == 0)
+            throw new InvalidOperationException("Không tìm thấy phiếu xuất kho.");
+
+        r_bUpdate = true;
+        CDM_Xuat_Kho v_objClone = new();
+        CUtility.Clone_Entity(m_objData, v_objClone);
+        r_objSource = v_objClone;
+
+        m_arrKho = new CDM_Kho_Controller().FQ_109_Kho_sp_sel_List();
+    }
+
+    protected override void Update_Data()
+    {
+        m_objData.So_Phieu_Xuat_Kho = m_objData.So_Phieu_Xuat_Kho?.Trim();
+        if (string.IsNullOrWhiteSpace(m_objData.So_Phieu_Xuat_Kho))
+            throw new InvalidOperationException("Số phiếu xuất không được để trống.");
+        if (m_objData.Kho_ID <= 0)
+            throw new InvalidOperationException("Kho không được để trống.");
+        if (!m_objData.Ngay_Xuat_Kho.HasValue)
+            throw new InvalidOperationException("Ngày xuất kho không được để trống.");
+
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+        new CDM_Xuat_Kho_Controller().FQ_111_XK_sp_upd_Update_Header(m_objData);
+
+        CDM_Xuat_Kho v_objCloneAfter = new();
+        CUtility.Clone_Entity(m_objData, v_objCloneAfter);
+        r_objDes = v_objCloneAfter;
+    }
+}

@@ -166,6 +166,87 @@ BEGIN
 END
 GO
 
+CREATE OR ALTER PROCEDURE dbo.FQ_111_NK_sp_upd_Update_Raw_Data
+	@Auto_ID BIGINT,
+	@SL_Nhap DECIMAL(18, 3),
+	@Don_Gia_Nhap DECIMAL(18, 2)
+AS
+BEGIN
+	SET NOCOUNT ON;
+	IF @SL_Nhap <= 0 THROW 50060, N'Số lượng nhập phải lớn hơn 0.', 1;
+	IF @Don_Gia_Nhap < 0 THROW 50061, N'Đơn giá nhập không được nhỏ hơn 0.', 1;
+	IF NOT EXISTS
+	(
+		SELECT 1
+		FROM dbo.tbl_DM_Nhap_Kho_Raw_Data R
+		JOIN dbo.tbl_DM_Nhap_Kho H ON H.Auto_ID = R.Nhap_Kho_ID
+		WHERE R.Auto_ID = @Auto_ID AND H.deleted = 0
+	)
+		THROW 50067, N'Không tìm thấy dòng hàng thuộc phiếu nhập đang hoạt động.', 1;
+
+	UPDATE dbo.tbl_DM_Nhap_Kho_Raw_Data
+	SET SL_Nhap = @SL_Nhap, Don_Gia_Nhap = @Don_Gia_Nhap
+	WHERE Auto_ID = @Auto_ID;
+END
+GO
+
+CREATE OR ALTER PROCEDURE dbo.FQ_111_NK_sp_del_Delete_Raw_Data
+	@Auto_ID BIGINT
+AS
+BEGIN
+	SET NOCOUNT ON;
+	IF NOT EXISTS
+	(
+		SELECT 1
+		FROM dbo.tbl_DM_Nhap_Kho_Raw_Data R
+		JOIN dbo.tbl_DM_Nhap_Kho H ON H.Auto_ID = R.Nhap_Kho_ID
+		WHERE R.Auto_ID = @Auto_ID AND H.deleted = 0
+	)
+		THROW 50067, N'Không tìm thấy dòng hàng thuộc phiếu nhập đang hoạt động.', 1;
+
+	DELETE FROM dbo.tbl_DM_Nhap_Kho_Raw_Data WHERE Auto_ID = @Auto_ID;
+END
+GO
+
+CREATE OR ALTER PROCEDURE dbo.FQ_111_NK_sp_upd_Update_Header
+	@Auto_ID BIGINT,
+	@So_Phieu_Nhap_Kho NVARCHAR(50),
+	@Kho_ID BIGINT,
+	@NCC_ID BIGINT,
+	@Ngay_Nhap_Kho DATE,
+	@Ghi_Chu NVARCHAR(1000),
+	@Last_Updated_By NVARCHAR(100),
+	@Last_Updated_By_Function NVARCHAR(100)
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SET @So_Phieu_Nhap_Kho = LTRIM(RTRIM(ISNULL(@So_Phieu_Nhap_Kho, N'')));
+
+	IF @So_Phieu_Nhap_Kho = N'' THROW 50051, N'Số phiếu nhập không được để trống.', 1;
+	IF ISNULL(@Kho_ID, 0) <= 0 THROW 50052, N'Kho không được để trống.', 1;
+	IF ISNULL(@NCC_ID, 0) <= 0 THROW 50053, N'Nhà cung cấp không được để trống.', 1;
+	IF @Ngay_Nhap_Kho IS NULL THROW 50054, N'Ngày nhập kho không được để trống.', 1;
+	IF NOT EXISTS (SELECT 1 FROM dbo.tbl_DM_Kho WHERE Auto_ID = @Kho_ID AND deleted = 0)
+		THROW 50055, N'Kho không tồn tại hoặc đã ngưng sử dụng.', 1;
+	IF NOT EXISTS (SELECT 1 FROM dbo.tbl_DM_NCC WHERE Auto_ID = @NCC_ID AND deleted = 0)
+		THROW 50056, N'Nhà cung cấp không tồn tại hoặc đã ngưng sử dụng.', 1;
+	IF EXISTS (SELECT 1 FROM dbo.tbl_DM_Nhap_Kho WHERE So_Phieu_Nhap_Kho = @So_Phieu_Nhap_Kho AND deleted = 0 AND Auto_ID <> @Auto_ID)
+		THROW 50057, N'Số phiếu nhập đã tồn tại.', 1;
+
+	UPDATE dbo.tbl_DM_Nhap_Kho
+	SET So_Phieu_Nhap_Kho = @So_Phieu_Nhap_Kho,
+		Kho_ID = @Kho_ID,
+		NCC_ID = @NCC_ID,
+		Ngay_Nhap_Kho = @Ngay_Nhap_Kho,
+		Ghi_Chu = ISNULL(@Ghi_Chu, N''),
+		Last_Updated = SYSDATETIME(),
+		Last_Updated_By = ISNULL(@Last_Updated_By, N''),
+		Last_Updated_By_Function = ISNULL(@Last_Updated_By_Function, N'')
+	WHERE Auto_ID = @Auto_ID AND deleted = 0;
+END
+GO
+
+
 BEGIN TRY
 	BEGIN TRANSACTION;
 	DECLARE @Function_ID BIGINT;

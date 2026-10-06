@@ -1,0 +1,84 @@
+$root = "D:\Thuc Tap\TKS_Thuc_Tap_11"
+
+# --- 1) Fix package versions in all web projects ---
+$files = @(
+    "$root\TKS_Thuc_Tap_V11_Web\TKS_Thuc_Tap_V11_Web.csproj",
+    "$root\TKS_Thuc_Tap_V11_Web_Common\TKS_Thuc_Tap_V11_Web_Common.csproj",
+    "$root\TKS_Thuc_Tap_V11_Web_Control\TKS_Thuc_Tap_V11_Web_Control.csproj",
+    "$root\TKS_Thuc_Tap_V11_Web_Danh_Muc\TKS_Thuc_Tap_V11_Web_Danh_Muc.csproj",
+    "$root\TKS_Thuc_Tap_V11_Web_Dashboard\TKS_Thuc_Tap_V11_Web_Dashboard.csproj",
+    "$root\TKS_Thuc_Tap_V11_Web_Sys\TKS_Thuc_Tap_V11_Web_Sys.csproj"
+)
+
+foreach ($file in $files) {
+    if (-not (Test-Path $file)) { continue }
+
+    $text = Get-Content $file -Raw
+
+    # Normalize package versions
+    $text = $text -replace 'Microsoft\.AspNetCore\.Components" Version="8\.0\.\d+"',
+                           'Microsoft.AspNetCore.Components" Version="8.0.27"'
+    $text = $text -replace 'Microsoft\.AspNetCore\.Components\.Web" Version="8\.0\.\d+"',
+                           'Microsoft.AspNetCore.Components.Web" Version="8.0.27"'
+    $text = $text -replace 'Microsoft\.Data\.SqlClient" Version="(5|6|7)\.1\.\d+"',
+                           'Microsoft.Data.SqlClient" Version="7.1.1"'
+    $text = $text -replace 'Newtonsoft\.Json" Version="13\.0\.\d+"',
+                           'Newtonsoft.Json" Version="13.0.4"'
+    $text = $text -replace 'Telerik\.Reporting\.OpenXmlRendering" Version="[^"]+"',
+                           'Telerik.Reporting.OpenXmlRendering" Version="20.2.26.812"'
+    $text = $text -replace 'Telerik\.Reporting\.Services\.AspNetCore" Version="[^"]+"',
+                           'Telerik.Reporting.Services.AspNetCore" Version="20.2.26.812"'
+    $text = $text -replace 'Telerik\.ReportViewer\.Blazor" Version="[^"]+"',
+                           'Telerik.ReportViewer.Blazor" Version="20.2.26.812"'
+    $text = $text -replace 'Telerik\.UI\.for\.Blazor" Version="[^"]+"',
+                           'Telerik.UI.for.Blazor" Version="14.0.0"'
+
+    # Add NewtonsoftJson package to Web project only if missing
+    if ($file -like "*TKS_Thuc_Tap_V11_Web.csproj") {
+        if ($text -notmatch 'Microsoft\.AspNetCore\.Mvc\.NewtonsoftJson') {
+            $text = $text.Replace('<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.27" />',
+                                  '<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.27" />' + "`r`n    <PackageReference Include=`"Microsoft.AspNetCore.Mvc.NewtonsoftJson`" Version=`"8.0.27`" />")
+        }
+    }
+
+    # Add FrameworkReference to Razor class libraries if missing
+    if ($text -notmatch 'FrameworkReference Include="Microsoft.AspNetCore.App"') {
+        $marker = '</PropertyGroup>'
+        if ($text.Contains($marker)) {
+            $text = $text.Replace($marker, "</PropertyGroup>`r`n`r`n    <ItemGroup>`r`n        <FrameworkReference Include=`"Microsoft.AspNetCore.App`" />`r`n    </ItemGroup>")
+        }
+    }
+
+    Set-Content $file $text -NoNewline
+Write-Host "Updated: $file"
+}
+
+# --- 2) Remove missing Azure.Core using lines only ---
+$azureFiles = @(
+    "$root\TKS_Thuc_Tap_V11_Data_Access\Controller\Cache\CCache_Chuc_Nang.cs",
+    "$root\TKS_Thuc_Tap_V11_Data_Access\Controller\Cache\CCache_Phan_Quyen_Chuc_Nang.cs",
+    "$root\TKS_Thuc_Tap_V11_Data_Access\Utility\CUtility_HTML_Status.cs"
+)
+
+foreach ($file in $azureFiles) {
+    if (Test-Path $file) {
+        $text = Get-Content $file -Raw
+        if ($text.Contains('using Azure.Core;')) {
+            $text = $text.Replace('using Azure.Core;' + "`r`n", '').Replace('using Azure.Core;', '')
+            Set-Content $file $text -NoNewline
+            Write-Host "Removed Azure.Core using: $file"
+        }
+    }
+}
+
+# --- 3) Restore/build ---
+Write-Host ""
+Write-Host "Running restore..."
+dotnet restore "$root\TKS_Thuc_Tap_V11.sln"
+
+Write-Host ""
+Write-Host "Running build..."
+dotnet build "$root\TKS_Thuc_Tap_V11.sln" -c Debug
+
+Write-Host ""
+Write-Host "DONE"

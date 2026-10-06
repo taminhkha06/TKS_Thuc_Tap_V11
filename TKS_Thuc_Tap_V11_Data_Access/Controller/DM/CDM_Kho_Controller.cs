@@ -5,6 +5,8 @@ using TKS_Thuc_Tap_V11_Data_Access.DataLayer;
 using TKS_Thuc_Tap_V11_Data_Access.Entity.DM;
 using TKS_Thuc_Tap_V11_Data_Access.Utility;
 
+using Microsoft.Data.SqlClient;
+
 namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 {
 	public class CDM_Kho_Controller
@@ -46,6 +48,12 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 		public long FQ_109_Kho_sp_ins_Insert(CDM_Kho p_objData)
 		{
 			return Convert.ToInt64(CSqlHelper.ExecuteScalar(CConfig.TKS_Thuc_Tap_V11_Conn_String, "FQ_109_Kho_sp_ins_Insert",
+				p_objData.Ten_Kho, p_objData.Ghi_Chu, p_objData.Last_Updated_By, p_objData.Last_Updated_By_Function));
+		}
+
+		public long FQ_109_Kho_sp_ins_Insert(SqlConnection p_conn, SqlTransaction p_trans, CDM_Kho p_objData)
+		{
+			return Convert.ToInt64(CSqlHelper.ExecuteScalar(p_conn, p_trans, CConfig.TKS_Thuc_Tap_V11_Conn_String, "FQ_109_Kho_sp_ins_Insert",
 				p_objData.Ten_Kho, p_objData.Ghi_Chu, p_objData.Last_Updated_By, p_objData.Last_Updated_By_Function));
 		}
 

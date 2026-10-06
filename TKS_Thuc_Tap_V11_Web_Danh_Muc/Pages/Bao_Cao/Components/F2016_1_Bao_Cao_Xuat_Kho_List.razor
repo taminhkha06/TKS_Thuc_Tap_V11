@@ -1,0 +1,101 @@
+@inherits FBase;
+
+<EditForm Model="@r_objFilter">
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="row g-3">
+                <div style="width: 80px; padding-top: 8px;">
+                    <label class="form-label">@Get_Language_Data_Field("Từ ngày"):</label>
+                </div>
+                <div style="width: 140px;">
+                    <TelerikDatePicker @bind-Value="@r_objFilter.Date_From" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                </div>
+                <div style="width: 40px; text-align: center; padding-top: 8px;">
+                    <label class="form-label">--></label>
+                </div>
+                <div style="width: 140px;">
+                    <TelerikDatePicker @bind-Value="@r_objFilter.Date_To" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0">
+                        <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Tim_Kiem_Click())">@Get_Language_Data_Field("Tìm kiếm")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: right;">
+                @Layout_Tool_Button(grdData)
+            </div>
+        </div>
+    </div>
+</EditForm>
+<div style="padding-top: 10px;"></div>
+
+<div class="row">
+    <div class="col-lg-12">
+        @((MarkupString)r_strError)
+
+        <TelerikGrid Data="@v_arrData" Height="calc(100vh - 210px)" Resizable="true" Reorderable="true" @ref="@grdData">
+            <GridExport>
+                <GridExcelExport FileName="Bao_Cao_Xuat_Kho_Export" AllPages="true" />
+                <GridCsvExport FileName="Bao_Cao_Xuat_Kho_Export" AllPages="true" />
+            </GridExport>
+            <GridColumns>
+                @if (CCache_Grid_UI_Global.List_Data_By_Code("2016", "grdData").Count > 0)
+                {
+                    <FCommon_General_Col_Grid m_strFCode="2016" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                }
+                else
+                {
+                    <GridColumn Field="Ngay_Xuat_Kho" Title="Ngày xuất" Width="120px" DisplayFormat="{0:dd/MM/yyyy}"></GridColumn>
+                    <GridColumn Field="So_Phieu_Xuat_Kho" Title="Số phiếu xuất" Width="160px"></GridColumn>
+                    <GridColumn Field="Ma_San_Pham" Title="Mã sản phẩm" Width="140px"></GridColumn>
+                    <GridColumn Field="Ten_San_Pham" Title="Tên sản phẩm" Width="260px"></GridColumn>
+                    <GridColumn Field="SL_Xuat" Title="Số lượng" Width="120px" DisplayFormat="{0:N3}"></GridColumn>
+                    <GridColumn Field="Don_Gia_Xuat" Title="Đơn giá" Width="140px" DisplayFormat="{0:N2}"></GridColumn>
+                    <GridColumn Field="Tri_Gia" Title="Trị giá" Width="160px" DisplayFormat="{0:N2}"></GridColumn>
+                    <GridColumn Field="" Title=""></GridColumn>
+                }
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+
+<div class="row" style="padding-top: 5px;">
+    <div class="col-lg-12">
+        <div class="alert alert-light d-flex flex-wrap align-items-center justify-content-between" style="margin-bottom: 0;">
+            <strong>@Get_Language_Data_Field("Tổng cộng"):</strong>
+            <span>
+                @Get_Language_Data_Field("Số lượng"):&nbsp;<strong>@v_arrData.Sum(v_objItem => v_objItem.SL_Xuat).ToString("N3")</strong>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                @Get_Language_Data_Field("Trị giá"):&nbsp;<strong>@v_arrData.Sum(v_objItem => v_objItem.Tri_Gia).ToString("N2")</strong>
+            </span>
+        </div>
+    </div>
+</div>
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+    <FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@code {
+    private List<CBC_Bao_Cao_Xuat_Kho> v_arrData = new();
+    private TelerikGrid<CBC_Bao_Cao_Xuat_Kho> grdData = new();
+
+    protected override void Init_Data()
+    {
+        // Mặc định lọc từ đầu tháng hiện tại đến hôm nay
+        r_objFilter.Date_From = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        r_objFilter.Date_To = DateTime.Now;
+    }
+
+    protected override void Load_Data()
+    {
+        Format_Grid(grdData);
+        v_arrData = new CBC_Bao_Cao_Controller().FQ_2016_BC_sp_sel_Bao_Cao_Xuat_Kho(r_objFilter.Date_From, r_objFilter.Date_To);
+    }
+}

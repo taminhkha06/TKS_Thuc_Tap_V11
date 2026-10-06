@@ -192,6 +192,8 @@
                 if (r_bIs_Show_Message_Info == true)
                     v_objFH.Ten_Chuc_Nang = v_objFH.Ten_Chuc_Nang + " - " + Get_Language_Data_Field("Message excel import dialog");
 
+                v_objFH.Last_Updated_By = r_strActive_User_Name;
+                v_objFH.Last_Updated_By_Function = r_strActive_Function_Code;
                 v_objCtrFH.FQ_424_NKTCCN_sp_ins_Insert(v_objFH);
 
                 // TienPV tắt ngày 21/12/2023 vì menu đã chuyển qua dạng mega, ko xài trái, phải kia nữa. Khi nào xài thì bật lại d8oa5n code này.
@@ -885,6 +887,8 @@
 
             v_objFH.Ten_Chuc_Nang = v_strLang_Name + " - " + Get_Language_Data_Field("Export Excel");
 
+            v_objFH.Last_Updated_By = r_strActive_User_Name;
+            v_objFH.Last_Updated_By_Function = r_strActive_Function_Code;
             v_objCtrFH.FQ_424_NKTCCN_sp_ins_Insert(v_objFH);
 
 
@@ -943,6 +947,8 @@
 
             v_objFH.Ten_Chuc_Nang = v_strLang_Name + " - " + Get_Language_Data_Field("Export Excel");
 
+            v_objFH.Last_Updated_By = r_strActive_User_Name;
+            v_objFH.Last_Updated_By_Function = r_strActive_Function_Code;
             v_objCtrFH.FQ_424_NKTCCN_sp_ins_Insert(v_objFH);
         }
 
@@ -1000,6 +1006,8 @@
 
             v_objFH.Ten_Chuc_Nang = v_strLang_Name + " - " + Get_Language_Data_Field("Export CSV");
 
+            v_objFH.Last_Updated_By = r_strActive_User_Name;
+            v_objFH.Last_Updated_By_Function = r_strActive_Function_Code;
             v_objCtrFH.FQ_424_NKTCCN_sp_ins_Insert(v_objFH);
         }
 
@@ -1072,9 +1080,9 @@
 
     protected void Hide_Pageable<T>(TelerikGrid<T> p_grid)
     {
-    //var v_objState = p_grid.GetState(); // giữ state để sau khi thay đổi thì set lại
-        //var v_arrGrid_Props = p_grid.GetType().GetProperties(); //lấy các thuộc tính của grid
-        // v_arrGrid_Props.FirstOrDefault(x => x.Name == "Pageable").SetValue(p_grid, false);
+        var v_objState = p_grid.GetState(); // giữ state để sau khi thay đổi thì set lại
+        var v_arrGrid_Props = p_grid.GetType().GetProperties(); //lấy các thuộc tính của grid
+        v_arrGrid_Props.FirstOrDefault(x => x.Name == "Pageable").SetValue(p_grid, false);
         p_grid.Pageable = false;
     }
 

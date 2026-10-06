@@ -60,7 +60,7 @@
 
     protected override void Add_Data()
     {
-        if (m_iKho_ID <= 0)
+        if (m_iKho_ID <= 0) 
             throw new InvalidOperationException("Vui lòng chọn kho.");
         if (string.IsNullOrWhiteSpace(m_objData.Ma_Dang_Nhap))
             throw new InvalidOperationException("Mã đăng nhập không được để trống.");

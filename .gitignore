@@ -31,6 +31,8 @@ bld/
 [Oo]bj/
 [Oo]ut/
 [Ll]og/
+!TKS_Thuc_Tap_V11_Data_Access/Controller/Log/
+!TKS_Thuc_Tap_V11_Data_Access/Entity/Log/
 [Ll]ogs/
 
 # Visual Studio 2015/2017 cache/options directory

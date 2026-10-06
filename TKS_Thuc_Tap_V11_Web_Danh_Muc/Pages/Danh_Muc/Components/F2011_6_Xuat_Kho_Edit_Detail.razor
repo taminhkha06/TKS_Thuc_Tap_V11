@@ -1,0 +1,110 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh chi tiết phiếu xuất")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(() => Modal_Cancel())"></button>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <div class="modal-body">
+                <div class="row mb-3 bg-light p-3">
+                    <div class="col-lg-3"><label class="form-label-info">@Get_Language_Data_Field("Số phiếu xuất")</label><br /><span class="form-label">@m_objHeader.So_Phieu_Xuat_Kho</span></div>
+                    <div class="col-lg-3"><label class="form-label-info">@Get_Language_Data_Field("Ngày xuất")</label><br /><span class="form-label">@m_objHeader.Ngay_Xuat_Kho?.ToString("dd/MM/yyyy")</span></div>
+                    <div class="col-lg-3"><label class="form-label-info">@Get_Language_Data_Field("Kho")</label><br /><span class="form-label">@m_objHeader.Ten_Kho</span></div>
+                    <div class="col-lg-3"><label class="form-label-info">@Get_Language_Data_Field("Ghi chú")</label><br /><span class="form-label">@m_objHeader.Ghi_Chu</span></div>
+                </div>
+
+                <TelerikGrid Data="@m_arrRaw_Data" Height="350px" Resizable="true">
+                    <GridColumns>
+                        <GridColumn Field="Ma_San_Pham" Title="Mã sản phẩm" Width="150px"></GridColumn>
+                        <GridColumn Field="Ten_San_Pham" Title="Tên sản phẩm" Width="240px"></GridColumn>
+                        <GridColumn Field="SL_Xuat" Title="Số lượng" Width="120px" DisplayFormat="{0:F0}"></GridColumn>
+                        <GridColumn Field="Don_Gia_Xuat" Title="Đơn giá" Width="150px" DisplayFormat="{0:F0}"></GridColumn>
+                        <GridColumn Field="" Title="Trị giá" Width="160px">
+                            <Template>
+                                @(((context as CDM_Xuat_Kho_Raw_Data).SL_Xuat * (context as CDM_Xuat_Kho_Raw_Data).Don_Gia_Xuat).ToString("F0"))
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Title="Thêm" Width="70px">
+                            <HeaderTemplate>
+                                <button type="button" class="btn btn-link" title="@Get_Language_Data_Field("Thêm dòng")" @onclick="@(() => Open_Raw_Edit(0, null))">
+                                    <i class="ri-add-circle-line"></i>
+                                </button>
+                            </HeaderTemplate>
+                        </GridColumn>
+                        <GridColumn Title="Sửa" Width="70px">
+                            <Template>
+                                <button type="button" class="btn btn-link" title="@Get_Language_Data_Field("Sửa số lượng, đơn giá")" @onclick="@(() => Open_Raw_Edit((context as CDM_Xuat_Kho_Raw_Data).Auto_ID, context as CDM_Xuat_Kho_Raw_Data))">
+                                    <i class="ri-edit-2-line"></i>
+                                </button>
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Title="Xóa" Width="70px">
+                            <Template>
+                                <button type="button" class="btn btn-link text-danger" title="@Get_Language_Data_Field("Xóa dòng")" @onclick="@(() => Delete_Data((context as CDM_Xuat_Kho_Raw_Data).Auto_ID))">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </Template>
+                        </GridColumn>
+                    </GridColumns>
+                </TelerikGrid>
+                <div class="text-end mt-3">
+                    <strong>@Get_Language_Data_Field("Tổng tiền"):</strong> @m_arrRaw_Data.Sum(v_objItem => v_objItem.SL_Xuat * v_objItem.Don_Gia_Xuat).ToString("F0")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (m_bIs_Show_Raw_Edit)
+{
+    <F2011_5_Xuat_Kho_Raw_Edit r_iAuto_ID="@m_iRaw_Edit_ID" p_iXuat_Kho_ID="@m_iHeader_ID" p_objRaw_Data="@m_objRaw_Edit" OnClose="@Close_Raw_Edit"></F2011_5_Xuat_Kho_Raw_Edit>
+}
+
+@code {
+    private CDM_Xuat_Kho m_objHeader = new();
+    private List<CDM_Xuat_Kho_Raw_Data> m_arrRaw_Data = new();
+    private long m_iHeader_ID;
+    private long m_iRaw_Edit_ID;
+    private CDM_Xuat_Kho_Raw_Data m_objRaw_Edit;
+    private bool m_bIs_Show_Raw_Edit;
+
+    protected override void Load_Data()
+    {
+        if (m_iHeader_ID == 0)
+            m_iHeader_ID = r_iAuto_ID;
+
+        CDM_Xuat_Kho_Controller v_objCtrData = new();
+        m_objHeader = v_objCtrData.FQ_111_XK_sp_sel_Get_By_ID(m_iHeader_ID) ?? new CDM_Xuat_Kho();
+        m_arrRaw_Data = v_objCtrData.FQ_111_XK_sp_sel_List_Raw_By_Xuat_Kho_ID(m_iHeader_ID);
+    }
+
+    private void Open_Raw_Edit(long p_iRawID, CDM_Xuat_Kho_Raw_Data p_objRaw_Data)
+    {
+        m_iRaw_Edit_ID = p_iRawID;
+        m_objRaw_Edit = p_objRaw_Data;
+        m_bIs_Show_Raw_Edit = true;
+    }
+
+    private void Close_Raw_Edit(CEvent_Call_Back p_objEvent)
+    {
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data || p_objEvent.Message_ID == (int)EModal_Result.Close_Cancel)
+            m_bIs_Show_Raw_Edit = false;
+
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data)
+            Load_Data_Init();
+    }
+
+    protected override void Delete_Data_Entry(long p_iAuto_ID)
+    {
+        CDM_Xuat_Kho_Raw_Data v_objRaw = m_arrRaw_Data.FirstOrDefault(v_objItem => v_objItem.Auto_ID == p_iAuto_ID);
+        if (v_objRaw != null)
+            r_strDelete_Key = v_objRaw.Ma_San_Pham + " - " + m_objHeader.So_Phieu_Xuat_Kho;
+
+        new CDM_Xuat_Kho_Controller().FQ_111_XK_sp_del_Delete_Raw_Data(p_iAuto_ID);
+    }
+}

@@ -49,8 +49,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
                 return CConst.FLT_VALUE_NULL;
         }
 
-<<<<<<< HEAD
-=======
         public static decimal Convert_To_Decimal(object p_objData)
         {
             if (p_objData != null && p_objData != System.DBNull.Value && CUtility.Convert_To_String(p_objData) != "")
@@ -59,7 +57,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
                 return CConst.FLT_VALUE_NULL;
         }
 
->>>>>>> Add project files.
         public static bool Convert_To_Bool(object p_objData)
         {
             if (p_objData != System.DBNull.Value)
@@ -661,11 +658,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
                             case "DateTime": v_objItem_Info.SetValue(v_objItem, CUtility.Convert_To_DateTime(p_Row[v_colValue])); break;
                             case "DateTime?": v_objItem_Info.SetValue(v_objItem, CUtility.Convert_To_DateTime(p_Row[v_colValue])); break;
                             case "Double": v_objItem_Info.SetValue(v_objItem, CUtility.Convert_To_Double(p_Row[v_colValue]), null); break;
-<<<<<<< HEAD
-                            case "Decimal": v_objItem_Info.SetValue(v_objItem, CUtility.Convert_To_Double(p_Row[v_colValue]), null); break;
-=======
                             case "Decimal": v_objItem_Info.SetValue(v_objItem, CUtility.Convert_To_Decimal(p_Row[v_colValue]), null); break;
->>>>>>> Add project files.
                             case "Boolean": v_objItem_Info.SetValue(v_objItem, CUtility.Convert_To_Bool(p_Row[v_colValue]), null); break;
                         }
                     }
@@ -706,11 +699,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
                         case "DateTime": v_objTargetProp.SetValue(p_objTarget, CUtility.Convert_To_DateTime(v_objSourceVal), null); break;
                         case "DateTime?": v_objTargetProp.SetValue(p_objTarget, CUtility.Convert_To_DateTime(v_objSourceVal), null); break;
                         case "Double": v_objTargetProp.SetValue(p_objTarget, CUtility.Convert_To_Double(v_objSourceVal), null); break;
-<<<<<<< HEAD
-                        case "Decimal": v_objTargetProp.SetValue(p_objTarget, CUtility.Convert_To_Double(v_objSourceVal), null); break;
-=======
                         case "Decimal": v_objTargetProp.SetValue(p_objTarget, CUtility.Convert_To_Decimal(v_objSourceVal), null); break;
->>>>>>> Add project files.
                         case "Boolean": v_objTargetProp.SetValue(p_objTarget, CUtility.Convert_To_Bool(v_objSourceVal), null); break;
                        
                     }

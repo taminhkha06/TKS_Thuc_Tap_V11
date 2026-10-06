@@ -125,13 +125,13 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 			using ExcelPackage v_objPackage = new(new FileInfo(p_strTemplate_Path));
 			ExcelWorksheet v_objSheet = v_objPackage.Workbook.Worksheets[0];
 
-			v_objSheet.Cells["B1"].Value = CConfig.Company_Name;
+			v_objSheet.Cells["A1"].Value = CConfig.Company_Name;
 			v_objSheet.Cells["A3"].Value = v_objHeader.Ngay_Nhap_Kho.HasValue
-				? v_objHeader.Ngay_Nhap_Kho.Value.ToString("'Ngày' dd 'tháng' MM 'năm' yyyy", CultureInfo.GetCultureInfo("vi-VN"))
+				? v_objHeader.Ngay_Nhap_Kho.Value.ToString("dd 'tháng' MM 'năm' yyyy", CultureInfo.GetCultureInfo("vi-VN"))
 				: "";
-			v_objSheet.Cells["B4"].Value = v_objHeader.So_Phieu_Nhap_Kho;
-			v_objSheet.Cells["C5"].Value = v_objHeader.Ten_NCC;
-			v_objSheet.Cells["C7"].Value = v_objHeader.Ten_Kho;
+			v_objSheet.Cells["A4"].Value = v_objHeader.So_Phieu_Nhap_Kho;
+			v_objSheet.Cells["A5"].Value = v_objHeader.Ten_NCC;
+			v_objSheet.Cells["A7"].Value = v_objHeader.Ten_Kho;
 
 			const int v_iFirst_Detail_Row = 12;
 			const int v_iTemplate_Detail_Row_Count = 10;
@@ -147,20 +147,19 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 				v_objSheet.Cells[v_iRow, 2].Value = v_objRaw.Ten_San_Pham;
 				v_objSheet.Cells[v_iRow, 3].Value = v_objRaw.Ma_San_Pham;
 				v_objSheet.Cells[v_iRow, 4].Value = v_objRaw.Ten_Don_Vi_Tinh;
-				v_objSheet.Cells[v_iRow, 5].Value = 0;
-				v_objSheet.Cells[v_iRow, 6].Value = v_objRaw.SL_Nhap;
+				v_objSheet.Cells[v_iRow, 5].Value = v_objRaw.SL_Nhap;
+				v_objSheet.Cells[v_iRow, 6].Value = "";
 				v_objSheet.Cells[v_iRow, 7].Value = v_objRaw.Don_Gia_Nhap;
 				v_objSheet.Cells[v_iRow, 8].Value = v_objRaw.SL_Nhap * v_objRaw.Don_Gia_Nhap;
 			}
 
 			int v_iTotal_Row = v_iFirst_Detail_Row + Math.Max(v_iTemplate_Detail_Row_Count, v_arrRaw_Data.Count);
-			v_objSheet.Cells[v_iTotal_Row, 4].Value = "Tổng";
-			v_objSheet.Cells[v_iTotal_Row, 5].Value = 0;
-			v_objSheet.Cells[v_iTotal_Row, 6].Value = v_arrRaw_Data.Sum(v_objRaw => v_objRaw.SL_Nhap);
+			v_objSheet.Cells[v_iTotal_Row, 3].Value = "Tổng";
+			v_objSheet.Cells[v_iTotal_Row, 5].Value = v_arrRaw_Data.Sum(v_objRaw => v_objRaw.SL_Nhap);
 			v_objSheet.Cells[v_iTotal_Row, 8].Value = v_arrRaw_Data.Sum(v_objRaw => v_objRaw.SL_Nhap * v_objRaw.Don_Gia_Nhap);
 
 			decimal v_decTong_Tien = v_arrRaw_Data.Sum(v_objRaw => v_objRaw.SL_Nhap * v_objRaw.Don_Gia_Nhap);
-			v_objSheet.Cells[v_iTotal_Row + 2, 2].Value = new CNumber().ReadInt(decimal.Truncate(v_decTong_Tien).ToString("0", CultureInfo.InvariantCulture), "USD");
+			v_objSheet.Cells[v_iTotal_Row + 2, 1].Value = "Tổng Số Tiền (Viết Bằng Chữ) : " + new CNumber().ReadInt(decimal.Truncate(v_decTong_Tien).ToString("0", CultureInfo.InvariantCulture), "USD");
 
 			return v_objPackage.GetAsByteArray();
 		}

@@ -1,0 +1,151 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">@Get_Language_Data_Field("Thêm phiếu xuất kho")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(() => Modal_Cancel())"></button>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <EditForm Model="@m_objHeader">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-3 mb-3">
+                            <label class="form-label">@Get_Language_Data_Field("Số phiếu xuất"):</label>
+                            <input @ref="txtFocus" @bind="m_objHeader.So_Phieu_Xuat_Kho" class="form-control" maxlength="50" required />
+                        </div>
+                        <div class="col-lg-3 mb-3">
+                            <label class="form-label">@Get_Language_Data_Field("Kho"):</label>
+                            <select @bind="m_objHeader.Kho_ID" class="form-select">
+                                <option value="0">-- @Get_Language_Data_Field("Chọn kho") --</option>
+                                @foreach (CDM_Kho v_objKho in m_arrKho)
+                                {
+                                    <option value="@v_objKho.Auto_ID">@v_objKho.Ten_Kho</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-lg-3 mb-3">
+                            <label class="form-label">@Get_Language_Data_Field("Ngày xuất kho"):</label>
+                            <TelerikDatePicker @bind-Value="m_objHeader.Ngay_Xuat_Kho" Format="@CConfig.Date_Format_String" Width="100%"></TelerikDatePicker>
+                        </div>
+                        <div class="col-lg-12 mb-3">
+                            <label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+                            <textarea @bind="m_objHeader.Ghi_Chu" class="form-control" rows="2" maxlength="1000"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">@Get_Language_Data_Field("Danh sách sản phẩm xuất")</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" @onclick="Add_Raw_Row">
+                            <i class="ri-add-line"></i> @Get_Language_Data_Field("Thêm dòng")
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 280px;">@Get_Language_Data_Field("Sản phẩm")</th>
+                                    <th style="width: 150px;">@Get_Language_Data_Field("Số lượng")</th>
+                                    <th style="width: 180px;">@Get_Language_Data_Field("Đơn giá xuất")</th>
+                                    <th style="width: 170px;">@Get_Language_Data_Field("Thành tiền")</th>
+                                    <th style="width: 54px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (CDM_Xuat_Kho_Raw_Data v_objRaw in m_arrRaw_Data)
+                                {
+                                    <tr>
+                                        <td>
+                                            <select @bind="v_objRaw.San_Pham_ID" class="form-select">
+                                                <option value="0">-- @Get_Language_Data_Field("Chọn sản phẩm") --</option>
+                                                @foreach (CDM_San_Pham v_objSan_Pham in m_arrSan_Pham)
+                                                {
+                                                    <option value="@v_objSan_Pham.Auto_ID">@v_objSan_Pham.Ma_San_Pham - @v_objSan_Pham.Ten_San_Pham (@v_objSan_Pham.Ten_Don_Vi_Tinh)</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><input type="number" min="0.001" step="0.001" @bind="v_objRaw.SL_Xuat" class="form-control" /></td>
+                                        <td><input type="number" min="0" step="0.01" @bind="v_objRaw.Don_Gia_Xuat" class="form-control" /></td>
+                                        <td class="text-end">@((v_objRaw.SL_Xuat * v_objRaw.Don_Gia_Xuat).ToString("N2"))</td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-link text-danger" title="@Get_Language_Data_Field("Xóa dòng")" @onclick="@(() => Remove_Raw_Row(v_objRaw))">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end"><strong>@Get_Language_Data_Field("Tổng tiền"):</strong> @Tong_Tien.ToString("N2")</div>
+                </div>
+            </EditForm>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu phiếu xuất")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CDM_Xuat_Kho m_objHeader = new();
+    private List<CDM_Xuat_Kho_Raw_Data> m_arrRaw_Data = new();
+    private List<CDM_Kho> m_arrKho = new();
+    private List<CDM_San_Pham> m_arrSan_Pham = new();
+
+    private decimal Tong_Tien => m_arrRaw_Data.Sum(v_objItem => v_objItem.SL_Xuat * v_objItem.Don_Gia_Xuat);
+
+    protected override void Load_Data()
+    {
+        m_arrKho = new CDM_Kho_Controller().FQ_109_Kho_sp_sel_List();
+        m_arrSan_Pham = new CDM_San_Pham_Controller().FQ_107_SP_sp_sel_List();
+        m_arrRaw_Data = new List<CDM_Xuat_Kho_Raw_Data> { new() { SL_Xuat = 1 } };
+        m_objHeader.Ngay_Xuat_Kho = DateTime.Today;
+    }
+
+    private void Add_Raw_Row()
+    {
+        m_arrRaw_Data.Add(new CDM_Xuat_Kho_Raw_Data { SL_Xuat = 1 });
+    }
+
+    private void Remove_Raw_Row(CDM_Xuat_Kho_Raw_Data p_objRaw)
+    {
+        if (m_arrRaw_Data.Count > 1)
+            m_arrRaw_Data.Remove(p_objRaw);
+    }
+
+    protected override void Add_Data()
+    {
+        m_objHeader.So_Phieu_Xuat_Kho = m_objHeader.So_Phieu_Xuat_Kho?.Trim();
+        m_objHeader.Ghi_Chu = m_objHeader.Ghi_Chu?.Trim();
+        if (string.IsNullOrWhiteSpace(m_objHeader.So_Phieu_Xuat_Kho))
+            throw new InvalidOperationException("Số phiếu xuất không được để trống.");
+        if (m_objHeader.Kho_ID <= 0)
+            throw new InvalidOperationException("Kho không được để trống.");
+        if (!m_objHeader.Ngay_Xuat_Kho.HasValue)
+            throw new InvalidOperationException("Ngày xuất kho không được để trống.");
+        if (m_arrRaw_Data.Count == 0)
+            throw new InvalidOperationException("Phiếu xuất phải có ít nhất một dòng sản phẩm.");
+
+        foreach (CDM_Xuat_Kho_Raw_Data v_objRaw in m_arrRaw_Data)
+        {
+            if (v_objRaw.San_Pham_ID <= 0)
+                throw new InvalidOperationException("Vui lòng chọn sản phẩm cho tất cả các dòng.");
+            if (v_objRaw.SL_Xuat <= 0)
+                throw new InvalidOperationException("Số lượng xuất phải lớn hơn 0.");
+            if (v_objRaw.Don_Gia_Xuat < 0)
+                throw new InvalidOperationException("Đơn giá xuất không được nhỏ hơn 0.");
+        }
+
+        m_objHeader.Last_Updated_By = r_strActive_User_Name;
+        m_objHeader.Last_Updated_By_Function = r_strActive_Function_Code;
+        m_objHeader.Auto_ID = r_iAuto_ID = new CDM_Xuat_Kho_Controller()
+            .FQ_111_XK_sp_ins_Insert_With_Raw_Data(m_objHeader, m_arrRaw_Data);
+        r_strAdd_Key = m_objHeader.So_Phieu_Xuat_Kho;
+    }
+}

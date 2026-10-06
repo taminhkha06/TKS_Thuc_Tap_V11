@@ -110,6 +110,7 @@
         // End tracking
 
         v_objCtrData.FQ_105_DVT_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+        CCache_Don_Vi_Tinh.Delete_Data(p_iAuto_ID);
     }
 
     protected override void Import_Excel_Entry(CExcel_Controller v_objCtrlExcel, ref int p_iCount_Success, ref int p_iCount_Error)
@@ -148,6 +149,8 @@
                     v_objData.Auto_ID = v_objCtrData.FQ_105_DVT_sp_ins_Insert(v_conn, v_trans, v_objData);
                     p_iCount_Success++;
                     v_trans.Commit();
+
+                    CCache_Don_Vi_Tinh.Add_Data(v_objData);
 
                     CCommon_Controller.FCommon_Insert_Action_History(v_objData.Auto_ID, Get_Language_Data_Field("Import Excel - Thêm Mới"), "Web", r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_objData.Ten_Don_Vi_Tinh);
                 }

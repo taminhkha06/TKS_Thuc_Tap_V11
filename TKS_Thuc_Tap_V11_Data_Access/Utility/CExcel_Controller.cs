@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Data;
@@ -19,8 +19,14 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		const int maxFileSize = 10485760;
 		private ExcelPackage m_objExcel_Package = null;
 
+		static CExcel_Controller()
+		{
+			ExcelPackage.License.SetNonCommercialOrganization("Công Ty Cổ Phần Logistics WMS");
+		}
+
 		public CExcel_Controller(FileInfo p_objFile_Info)
 		{
+			ExcelPackage.License.SetNonCommercialOrganization("Công Ty Cổ Phần Logistics WMS");
 			m_objExcel_Package = new ExcelPackage(p_objFile_Info);
         }
 
@@ -55,7 +61,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		public DataTable List_Range_Value(int p_intSheet_Index, string p_strCell_From, string p_strCell_End)
 		{
 			DataTable v_dt = new DataTable();
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[$"Sheet{p_intSheet_Index}"];
 			int v_intRowStart = v_excelWorksheet.Cells[p_strCell_From].End.Row;
@@ -97,7 +103,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
         public DataTable List_Range_Value_To_End(string p_strSheet_Name, string p_strCell_From, string p_strCell_End)
         {
             DataTable v_dt = new DataTable();
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_strSheet_Name];
             int v_intRowStart = v_excelWorksheet.Cells[p_strCell_From].End.Row;
@@ -130,7 +136,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		{
 			DataTable v_dt = new DataTable();
 			
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
 			int v_intRowStart = v_excelWorksheet.Cells[p_strCell_From].End.Row;
 			int v_intColumnStart = v_excelWorksheet.Cells[p_strCell_From].End.Column;
@@ -166,7 +172,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		public string Cell_From(int p_intSheet_Index)
 		{
 			string v_intCell_From;
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[$"Sheet{p_intSheet_Index}"];
 			v_intCell_From = v_excelWorksheet.Dimension.Start.Address.ToString();
@@ -182,7 +188,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		public string Cell_End(int p_intSheet_Index)
 		{
 			string v_intCell_End;
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 				
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[$"Sheet{p_intSheet_Index}"];
 			v_intCell_End = v_excelWorksheet.Dimension.End.Address.ToString();
@@ -198,7 +204,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		public int Row_From(int p_intSheet_Index)
 		{
 			int v_intRow_From;
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 				
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[$"Sheet{p_intSheet_Index}"];
 			v_intRow_From = v_excelWorksheet.Dimension.Start.Row;
@@ -214,7 +220,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		public int Column_From(int p_intSheet_Index)
 		{
 			int v_intColumn_From;
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 				
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[$"Sheet{p_intSheet_Index}"];
 			v_intColumn_From = v_excelWorksheet.Dimension.Start.Column;
@@ -230,7 +236,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		public int Row_End(int p_intSheet_Index)
 		{
 			int v_intRow_End;
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 				
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[$"Sheet{p_intSheet_Index}"];
 			v_intRow_End = v_excelWorksheet.Dimension.End.Row;
@@ -246,7 +252,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		public int Column_End(int p_intSheet_Index)
 		{
 			int v_intColumn_End;
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 				
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[$"Sheet{p_intSheet_Index}"];
 			v_intColumn_End = v_excelWorksheet.Dimension.End.Column;
@@ -264,7 +270,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		//	Dictionary<int, string[]> p_dicHeader_Field, Dictionary<int, string[]> p_dicBold_Text, Dictionary<int, string[]> p_dicBkd_Color)
 		//{
 		//	byte[] v_fileContents;
-		//	ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 		//	using (ExcelPackage v_excelPackage = new ExcelPackage())
 		//	{
 		//		var v_excelWorksheet = v_excelPackage.Workbook.Worksheets.Add($"Sheet{p_intSheet_Index}");
@@ -316,7 +322,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
         public static byte[] Export_Excel_Template(string p_strPath_File, int p_intSheet_Index, int p_iRow_Start, List<object[]> p_arrData)
         {
             byte[] v_arrContents;
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (ExcelPackage v_objPackage = new ExcelPackage(p_strPath_File))
             {
                 var v_objWorksheet = v_objPackage.Workbook.Worksheets[p_intSheet_Index];// v_objPackage.Workbook.Worksheets.($"Sheet{p_intSheet_Index}");
@@ -345,7 +351,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
             List<CCol_Grid_Property> p_arrCol_Grid, object[] p_objHeader_Band, object[] p_objHeader, int p_iLine_Band_End, DataTable p_dataTable)
         {
             byte[] v_arrContents;
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             //using (ExcelPackage v_objPackage = new ExcelPackage(p_strPath_File))
             {
                 var v_objWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
@@ -468,7 +474,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 		public string Get_Cell_Value(int p_intSheet_Index, string p_strCell)
 		{
 			string v_strCell_Value;
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 				
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[$"Sheet{p_intSheet_Index}"];
 			v_strCell_Value = CUtility.Convert_To_String(v_excelWorksheet.Cells[p_strCell].Value);
@@ -479,7 +485,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
         public string Get_Cell_Value(string p_strSheet_Name, string p_strCell)
         {
             string v_strCell_Value;
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_strSheet_Name];
             v_strCell_Value = CUtility.Convert_To_String(v_excelWorksheet.Cells[p_strCell].Value);
@@ -494,7 +500,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 
 		public void Set_Cell_Value<T>(int p_intSheet_Index, string p_strCell, T p_objValue_Cell)
 		{
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 				
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[$"Sheet{p_intSheet_Index}"];
 			v_excelWorksheet.Cells[p_strCell].Value = p_objValue_Cell.ToString();
@@ -521,7 +527,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 
 		public void Set_Value_To_Cell(int p_intSheet_Index, string p_strCell, object p_objValue)
 		{
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
 			v_excelWorksheet.Cells[p_strCell].Value = p_objValue;
 		}
@@ -533,7 +539,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 
 		public void Set_List_Range_Value(int p_intSheet_Index, int p_iCol_Start, int p_iCol_End, int p_intRowIndex, object[] p_arrValue)
 		{
-			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
 			string v_strCol_Start = CUtility.Get_Excel_ColumnName(p_iCol_Start);
 			if (v_strCol_Start == "")
@@ -604,7 +610,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
         public void Set_Color_To_Cell(int p_intSheet_Index, string p_strCell, string p_strMa_Mau)
         {
             Color colFromHex = System.Drawing.ColorTranslator.FromHtml(p_strMa_Mau);
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
             v_excelWorksheet.Cells[p_strCell].Style.Fill.PatternType = ExcelFillStyle.Solid;
             v_excelWorksheet.Cells[p_strCell].Style.Fill.BackgroundColor.SetColor(colFromHex);
@@ -613,14 +619,14 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 
         public void Set_Font_Text_To_Cell(int p_intSheet_Index, string p_strCell, bool p_blBlod)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
             v_excelWorksheet.Cells[p_strCell].Style.Font.Bold = p_blBlod;
         }
 
         public void Set_Border_Text_To_Cell(int p_intSheet_Index, string p_strCell)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
             v_excelWorksheet.Cells[p_strCell].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             v_excelWorksheet.Cells[p_strCell].Style.Border.Left.Style = ExcelBorderStyle.Thin;
@@ -630,14 +636,14 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 
         public void Set_Filter_Text_To_Cell(int p_intSheet_Index, string p_strCell)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
             v_excelWorksheet.Cells[p_strCell].AutoFilter = true;
         }
 
         public void Set_Merge_Cell(int p_intSheet_Index, string p_strCell_Start, string p_strCell_End)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
 			string v_strRegion_Cell = p_strCell_Start + ":"+ p_strCell_End;
             v_excelWorksheet.Cells[v_strRegion_Cell].Merge = true;
@@ -645,7 +651,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Utility
 
         public void Set_Function_To_Cell(int p_intSheet_Index, string p_strCell, string p_strFunction_Excel)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            // ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelWorksheet v_excelWorksheet = m_objExcel_Package.Workbook.Worksheets[p_intSheet_Index];
             v_excelWorksheet.Cells[p_strCell].Formula = p_strFunction_Excel;
         }

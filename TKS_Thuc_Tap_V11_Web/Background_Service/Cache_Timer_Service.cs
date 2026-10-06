@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using TKS_Thuc_Tap_V11_Data_Access.Controller.Cache;
 using TKS_Thuc_Tap_V11_Data_Access.Controller.Common;
 using TKS_Thuc_Tap_V11_Data_Access.Entity.Sys;
@@ -40,6 +40,12 @@ namespace TKS_Thuc_Tap_V11_Web.Background_Service
 
 				CCache_Grid_Field.Load_Cache_Grid_Field();
 				CCache_Grid_UI_Global.Load_Cache_Grid_UI_Global();
+
+				CCache_Don_Vi_Tinh.Load_Cache_Don_Vi_Tinh();
+				CCache_Loai_San_Pham.Load_Cache_Loai_San_Pham();
+				CCache_San_Pham.Load_Cache_San_Pham();
+				CCache_Nha_Cung_Cap.Load_Cache_Nha_Cung_Cap();
+				CCache_Kho.Load_Cache_Kho();
 
 				CCache_Common_Controller.Is_Completed_Load_Cache = true;
             }

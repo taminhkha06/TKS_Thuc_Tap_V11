@@ -36,7 +36,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.Common
                     Ma_Chuc_Nang = p_strChuc_Nang,
                     Ten_Chuc_Nang = p_strTen_Chuc_Nang,
                     Noi_Dung_Action = p_strNoi_Dung_Action,
-                    Created_By = p_strCreated_By
+                    Created_By = p_strCreated_By,
+                    Last_Updated_By_Function = p_strChuc_Nang
                 };
 
                 v_objCtrAH.FQ_425_RAH_sp_ins_Insert(v_objAH);
@@ -63,7 +64,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.Common
                     Ma_Chuc_Nang = p_strChuc_Nang,
                     Ten_Chuc_Nang = p_strTen_Chuc_Nang,
                     Noi_Dung_Action = p_strNoi_Dung_Action,
-                    Created_By = p_strCreated_By
+                    Created_By = p_strCreated_By,
+                    Last_Updated_By_Function = p_strChuc_Nang
                 };
 
                 v_objCtrAH.FQ_425_RAH_sp_ins_Insert(p_Conn, p_Tran, v_objAH);

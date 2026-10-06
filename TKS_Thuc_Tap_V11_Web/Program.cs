@@ -11,6 +11,9 @@ using TKS_Thuc_Tap_V11_Data_Access.Utility;
 using Append.Blazor.Printing;
 using TKS_Thuc_Tap_V11_Web.Background_Service;
 using TKS_Thuc_Tap_V11_Web;
+using OfficeOpenXml;
+
+ExcelPackage.License.SetNonCommercialOrganization("Công Ty Cổ Phần Logistics WMS");
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -97,6 +100,11 @@ CCache_Nhom_Thanh_Vien_User.Load_Cache_Nhom_Thanh_Vien_User();
 CCache_Phan_Quyen_Chuc_Nang.Load_Cache_Phan_Quyen_Chuc_Nang();
 CCache_Token.Load_Cache_Token();
 CCache_Thanh_Vien.Load_Cache_Thanh_Vien();
+CCache_Don_Vi_Tinh.Load_Cache_Don_Vi_Tinh();
+CCache_Loai_San_Pham.Load_Cache_Loai_San_Pham();
+CCache_San_Pham.Load_Cache_San_Pham();
+CCache_Nha_Cung_Cap.Load_Cache_Nha_Cung_Cap();
+CCache_Kho.Load_Cache_Kho();
 
 builder.Services.AddHostedService<Cache_Timer_Service>();
 
@@ -132,6 +140,16 @@ app.UseEndpoints(endpoints =>
     // ... 
 });
 // Xử lý các URL dạng file
+try
+{
+    string v_strTemplateDir = Path.Combine(app.Environment.WebRootPath, "FileManagement", "Template");
+    CExcel_Template_Helper.Ensure_All_Templates_Exist(v_strTemplateDir);
+}
+catch (Exception ex)
+{
+    CLogger.Error("Program", "Ensure_All_Templates_Exist", ex.Message);
+}
+
 if (CConfig.Import_Excel_URL != "")
 {
     if (CConfig.Import_Excel_URL[1] != ':')

@@ -1,0 +1,299 @@
+@inherits FBase;
+
+<style>
+    .receipt-print-preview {
+        width: min(100%, 1120px);
+        margin: 0 auto;
+        padding: 18px;
+        background: #fff;
+        color: #111;
+        font-family: "Times New Roman", serif;
+        font-size: 14px;
+    }
+
+    .receipt-print-preview h1 {
+        margin: 0 0 8px;
+        font-family: Arial, sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .receipt-print-meta {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr 1fr;
+        gap: 18px;
+        align-items: start;
+        margin-bottom: 16px;
+    }
+
+    .receipt-print-meta p {
+        margin: 2px 0;
+    }
+
+    .receipt-print-center {
+        text-align: center;
+    }
+
+    .receipt-print-right {
+        text-align: center;
+    }
+
+    .receipt-print-underline {
+        display: inline-block;
+        min-width: 130px;
+        border-bottom: 1px dotted #222;
+    }
+
+    .receipt-print-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .receipt-print-table th,
+    .receipt-print-table td {
+        border: 1px solid #57606a;
+        padding: 5px 6px;
+        vertical-align: middle;
+    }
+
+    .receipt-print-table th {
+        background: #d9dee8;
+        font-family: Arial, sans-serif;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .receipt-print-table .receipt-print-subhead th {
+        background: #e7eaf0;
+    }
+
+    .receipt-print-number {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .receipt-print-center-cell {
+        text-align: center;
+    }
+
+    .receipt-print-total td {
+        background: #d9dee8;
+        font-weight: 700;
+    }
+
+    .receipt-print-summary {
+        margin-top: 10px;
+        font-weight: 700;
+    }
+
+    .receipt-print-signatures {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 26px;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        font-weight: 700;
+    }
+
+    .receipt-print-signatures small {
+        display: block;
+        margin-top: 4px;
+        font-family: "Times New Roman", serif;
+        font-weight: 400;
+    }
+
+    @@media print {
+        @@page {
+            size: A4 landscape;
+            margin: 8mm;
+        }
+
+        body * {
+            visibility: hidden !important;
+        }
+
+        #receipt-print-sheet,
+        #receipt-print-sheet * {
+            visibility: visible !important;
+        }
+
+        #receipt-print-sheet {
+            position: absolute !important;
+            inset: 0 auto auto 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            background: #fff !important;
+        }
+
+        .receipt-print-actions,
+        .modal-backdrop,
+        .modal-header {
+            display: none !important;
+        }
+
+        .receipt-print-preview {
+            width: 100% !important;
+            max-width: none !important;
+            padding: 0 !important;
+            font-size: 11px !important;
+        }
+
+        .receipt-print-preview h1 {
+            font-size: 21px !important;
+        }
+
+        .receipt-print-table th,
+        .receipt-print-table td {
+            padding: 3px 4px !important;
+        }
+    }
+</style>
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-light receipt-print-actions">
+                <h5 class="modal-title">@Get_Language_Data_Field("In phiếu xuất kho")</h5>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-primary" @onclick="Download_Template">
+                        <i class="ri-file-excel-2-line me-1"></i> @Get_Language_Data_Field("Tải mẫu Excel đã điền")
+                    </button>
+                    <button type="button" class="btn btn-primary" @onclick="Print_Receipt">
+                        <i class="ri-printer-line me-1"></i> @Get_Language_Data_Field("In phiếu")
+                    </button>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="@(() => Modal_Cancel())"></button>
+                </div>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <div class="modal-body">
+                <section id="receipt-print-sheet" class="receipt-print-preview">
+                    <div class="receipt-print-meta">
+                        <div>
+                            <p><strong>@Get_Language_Data_Field("Đơn vị"):</strong> @CConfig.Company_Name</p>
+                            <p><strong>@Get_Language_Data_Field("Bộ phận"):</strong> <span class="receipt-print-underline"></span></p>
+                            <p><strong>@Get_Language_Data_Field("Ngày"):</strong> @m_objHeader.Ngay_Xuat_Kho?.ToString("dd 'tháng' MM 'năm' yyyy")</p>
+                            <p><strong>@Get_Language_Data_Field("Số phiếu xuất"):</strong> @m_objHeader.So_Phieu_Xuat_Kho</p>
+                            <p><strong>@Get_Language_Data_Field("Họ tên người nhận hàng"):</strong> <span class="receipt-print-underline"></span></p>
+                            <p><strong>@Get_Language_Data_Field("Theo chứng từ số"):</strong> <span class="receipt-print-underline"></span></p>
+                            <p><strong>@Get_Language_Data_Field("Xuất tại kho"):</strong> @m_objHeader.Ten_Kho</p>
+                        </div>
+                        <div class="receipt-print-center">
+                            <h1>@Get_Language_Data_Field("PHIẾU XUẤT KHO")</h1>
+                            <p><strong>@Get_Language_Data_Field("Nợ"):</strong> <span class="receipt-print-underline"></span></p>
+                            <p><strong>@Get_Language_Data_Field("Có"):</strong> <span class="receipt-print-underline"></span></p>
+                            <p>@Get_Language_Data_Field("Địa điểm"): <span class="receipt-print-underline"></span></p>
+                        </div>
+                        <div class="receipt-print-right">
+                            <p><strong>@Get_Language_Data_Field("Mẫu số: 02-VT")</strong></p>
+                            <p>@Get_Language_Data_Field("(Ban hành theo quy định hiện hành)")</p>
+                            <p>@Get_Language_Data_Field("Ngày 20/03/2006 của Bộ trưởng BTC")</p>
+                        </div>
+                    </div>
+
+                    <table class="receipt-print-table">
+                        <colgroup>
+                            <col style="width: 5%;" />
+                            <col style="width: 27%;" />
+                            <col style="width: 15%;" />
+                            <col style="width: 10%;" />
+                            <col style="width: 13%;" />
+                            <col style="width: 15%;" />
+                            <col style="width: 15%;" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>@Get_Language_Data_Field("Tên nhãn hiệu, quy cách, phẩm chất, vật tư, dụng cụ, sản phẩm, hàng hóa")</th>
+                                <th>@Get_Language_Data_Field("Mã hàng")</th>
+                                <th>@Get_Language_Data_Field("Đơn vị tính")</th>
+                                <th>@Get_Language_Data_Field("Số lượng")</th>
+                                <th>@Get_Language_Data_Field("Đơn giá")</th>
+                                <th>@Get_Language_Data_Field("Thành tiền")</th>
+                            </tr>
+                            <tr class="receipt-print-subhead">
+                                <th>A</th><th>B</th><th>C</th><th>D</th><th>1</th><th>3</th><th>4</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int v_i = 0; v_i < m_arrLines.Count; v_i++)
+                            {
+                                CDM_Xuat_Kho_Raw_Data v_objLine = m_arrLines[v_i];
+                                <tr>
+                                    <td class="receipt-print-center-cell">@(v_i + 1)</td>
+                                    <td>@v_objLine.Ten_San_Pham</td>
+                                    <td class="receipt-print-center-cell">@v_objLine.Ma_San_Pham</td>
+                                    <td class="receipt-print-center-cell">@v_objLine.Ten_Don_Vi_Tinh</td>
+                                    <td class="receipt-print-number">@v_objLine.SL_Xuat.ToString("N3")</td>
+                                    <td class="receipt-print-number">@v_objLine.Don_Gia_Xuat.ToString("N2")</td>
+                                    <td class="receipt-print-number">@((v_objLine.SL_Xuat * v_objLine.Don_Gia_Xuat).ToString("N2"))</td>
+                                </tr>
+                            }
+                            <tr class="receipt-print-total">
+                                <td colspan="4" class="receipt-print-number">@Get_Language_Data_Field("Tổng")</td>
+                                <td class="receipt-print-number">@Tong_So_Luong.ToString("N3")</td>
+                                <td></td>
+                                <td class="receipt-print-number">@Tong_Tien.ToString("N2")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p class="receipt-print-summary"><strong>@Get_Language_Data_Field("Tổng số tiền (viết bằng chữ)"):</strong> @So_Tien_Bang_Chu</p>
+                    <p class="receipt-print-summary"><strong>@Get_Language_Data_Field("Số chứng từ gốc kèm theo"):</strong> <span class="receipt-print-underline"></span></p>
+                    <p class="receipt-print-summary text-end">@Get_Language_Data_Field("Ngày") ...... @Get_Language_Data_Field("Tháng") ...... @Get_Language_Data_Field("Năm") ......</p>
+
+                    <div class="receipt-print-signatures">
+                        <div>@Get_Language_Data_Field("Người lập phiếu")<small>(@Get_Language_Data_Field("Ký, họ tên"))</small></div>
+                        <div>@Get_Language_Data_Field("Người nhận hàng")<small>(@Get_Language_Data_Field("Ký, họ tên"))</small></div>
+                        <div>@Get_Language_Data_Field("Thủ kho")<small>(@Get_Language_Data_Field("Ký, họ tên"))</small></div>
+                        <div>@Get_Language_Data_Field("Kế toán trưởng")<small>(@Get_Language_Data_Field("Ký, họ tên"))</small></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CDM_Xuat_Kho m_objHeader = new();
+    private List<CDM_Xuat_Kho_Raw_Data> m_arrLines = new();
+    private decimal Tong_So_Luong => m_arrLines.Sum(v_objLine => v_objLine.SL_Xuat);
+    private decimal Tong_Tien => m_arrLines.Sum(v_objLine => v_objLine.SL_Xuat * v_objLine.Don_Gia_Xuat);
+    private string So_Tien_Bang_Chu => new CNumber().ReadInt(decimal.Truncate(Tong_Tien).ToString("0"), "USD");
+
+    protected override void Load_Data()
+    {
+        CDM_Xuat_Kho_Controller v_objCtrData = new();
+        m_objHeader = v_objCtrData.FQ_111_XK_sp_sel_Get_By_ID(r_iAuto_ID) ?? new CDM_Xuat_Kho();
+        m_arrLines = v_objCtrData.FQ_111_XK_sp_sel_List_Raw_By_Xuat_Kho_ID(r_iAuto_ID);
+    }
+
+    private async Task Print_Receipt()
+    {
+        await g_jsRuntime.InvokeVoidAsync("window.print");
+    }
+
+    private async Task Download_Template()
+    {
+        string v_strTemplate_Path = Path.Combine(g_objEnvironment.WebRootPath,
+            "FileManagement", "Template", "Phieu_Xuat_Kho_Template.xlsx");
+        byte[] v_arrBytes = new CDM_Xuat_Kho_Controller()
+            .FQ_111_XK_rpt_Generate_Print_Template(r_iAuto_ID, v_strTemplate_Path);
+
+        string v_strSafe_Number = string.Concat(m_objHeader.So_Phieu_Xuat_Kho
+            .Select(v_ch => Path.GetInvalidFileNameChars().Contains(v_ch) ? '_' : v_ch));
+        string v_strFile_Name = "Phieu_Xuat_Kho_" + v_strSafe_Number + ".xlsx";
+
+        using MemoryStream v_objStream = new(v_arrBytes);
+        using DotNetStreamReference v_objStream_Ref = new(v_objStream);
+        await g_jsRuntime.InvokeVoidAsync("downloadFileFromStream", v_strFile_Name, v_objStream_Ref);
+    }
+}
